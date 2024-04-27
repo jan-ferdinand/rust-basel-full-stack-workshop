@@ -1,3 +1,9 @@
+use dioxus::prelude::*;
+
 fn main() {
-    println!("Hello, world!");
+    launch(application)
+}
+
+fn application() -> Element {
+    rsx!("Hello, Basel.")
 }
