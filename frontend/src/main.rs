@@ -1,9 +1,19 @@
 use dioxus::prelude::*;
 
+const _STYLE: &str = manganis::mg!(file("public/tailwind.css"));
+
 fn main() {
     launch(application)
 }
 
 fn application() -> Element {
-    rsx!("Hello, Basel.")
+    rsx!(
+        h1 {
+            "Hello, Basel."
+        }
+        button {
+            class: "btn",
+            "Click me maybe ✨"
+        }
+    )
 }

@@ -2,6 +2,7 @@
 # Edit at https://www.toptal.com/developers/gitignore?templates=rust,jetbrains
 
 frontend/dist/*
+frontend/public/tailwind.css
 
 node_modules/*
 package-lock.json
