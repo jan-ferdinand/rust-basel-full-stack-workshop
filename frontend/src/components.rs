@@ -25,7 +25,8 @@ pub fn shopping_list(change_signal: Signal<ListChange>) -> Element {
                             key: "{i.uuid}",
                             shopping_list_item_component {
                                 display_name: i.title.clone(),
-                                posted_by: i.posted_by.clone()
+                                posted_by: i.posted_by.clone(),
+                                uuid: i.uuid.clone(),
                             }
                         }
                     }
@@ -38,7 +39,7 @@ pub fn shopping_list(change_signal: Signal<ListChange>) -> Element {
 }
 
 #[component]
-fn shopping_list_item_component(display_name: String, posted_by: String) -> Element {
+fn shopping_list_item_component(uuid: String, display_name: String, posted_by: String) -> Element {
     rsx! {
         div {
             class: "flex items-center space-x-2",
@@ -47,6 +48,36 @@ fn shopping_list_item_component(display_name: String, posted_by: String) -> Elem
                 "{display_name}"
             }
             span { "posted by {posted_by}" }
+            item_delete_button { uuid }
+        }
+    }
+}
+
+#[component]
+fn item_delete_button(uuid: String) -> Element {
+    let onclick = move |_| {
+        let uuid = uuid.clone();
+        spawn(async move {
+            let _ = controllers::delete_item(&uuid).await;
+        });
+    };
+
+    rsx! {
+        button {
+            onclick: onclick,
+            class: "btn btn-circle",
+            svg {
+                class: "h-6 w-6",
+                view_box: "0 0 24 24",
+                stroke: "currentColor",
+                stroke_width: "2",
+                stroke_linecap: "round",
+                stroke_linejoin: "round",
+                fill: "none",
+                path {
+                    d: "M6 18L18 6M6 6l12 12"
+                }
+            }
         }
     }
 }

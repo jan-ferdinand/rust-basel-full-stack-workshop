@@ -20,3 +20,11 @@ pub async fn post_item(item: PostShoppingItem) -> Result<ShoppingListItem, reqwe
 
     Ok(response)
 }
+
+pub async fn delete_item(item_id: &str) -> Result<(), reqwest::Error> {
+    reqwest::Client::new()
+        .delete(format!("http://localhost:3001/items/{item_id}"))
+        .send()
+        .await?;
+    Ok(())
+}
