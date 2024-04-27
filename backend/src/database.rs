@@ -20,11 +20,13 @@ impl ShoppingItem {
 #[derive(Debug, Clone, PartialEq)]
 pub struct InMemoryDatabase<K, V>(HashMap<K, V>)
 where
-    K: Eq + Hash;
+    K: Eq + Hash + Clone,
+    V: Clone;
 
 impl<K, V> InMemoryDatabase<K, V>
 where
-    K: Eq + Hash,
+    K: Eq + Hash + Clone,
+    V: Clone,
 {
     fn _create(&mut self, k: K, v: V) -> Option<V> {
         self.0.insert(k, v)
@@ -36,6 +38,11 @@ where
 
     fn _delete(&mut self, k: &K) -> Option<V> {
         self.0.remove(k)
+    }
+
+    pub fn to_vec(&self) -> Vec<(K, V)> {
+        let to_owned = |(k, v): (&K, &V)| (k.to_owned(), v.to_owned());
+        self.0.iter().map(to_owned).collect()
     }
 }
 
