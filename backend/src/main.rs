@@ -2,6 +2,7 @@ use std::sync::Arc;
 use std::sync::RwLock;
 
 use axum::routing::get;
+use axum::routing::post;
 use axum::Router;
 use tower_http::cors::CorsLayer;
 
@@ -15,6 +16,7 @@ async fn main() {
     let db = Database::default();
     let app = Router::new()
         .route("/items", get(controller::items))
+        .route("/items", post(controller::add_item))
         .layer(CorsLayer::permissive()) // never use “CorsLayer::permissive()” in production!
         .with_state(db);
 

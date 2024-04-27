@@ -2,7 +2,9 @@ use axum::extract::State;
 use axum::http::StatusCode;
 use axum::response::IntoResponse;
 use axum::Json;
+use uuid::Uuid;
 
+use model::PostShoppingItem;
 use model::ShoppingListItem;
 
 use crate::database::ShoppingItem;
@@ -30,4 +32,32 @@ pub async fn items(State(state): State<Database>) -> impl IntoResponse {
         .collect::<Vec<_>>();
 
     (StatusCode::OK, Json(items)).into_response()
+}
+
+pub async fn add_item(
+    State(state): State<Database>,
+    Json(post_request): Json<PostShoppingItem>,
+) -> impl IntoResponse {
+    let PostShoppingItem { title, posted_by } = post_request;
+    let item = ShoppingItem {
+        title: title.clone(),
+        creator: posted_by.clone(),
+    };
+    let uuid = Uuid::new_v4().to_string();
+
+    // scope off unique access to `RwLock`
+    {
+        let Ok(mut db) = state.write() else {
+            return StatusCode::SERVICE_UNAVAILABLE.into_response();
+        };
+        db.create(uuid.clone(), item);
+    }
+
+    let item = ShoppingListItem {
+        title,
+        posted_by,
+        uuid,
+    };
+
+    (StatusCode::OK, Json(item)).into_response()
 }

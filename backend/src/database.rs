@@ -28,7 +28,7 @@ where
     K: Eq + Hash + Clone,
     V: Clone,
 {
-    fn _create(&mut self, k: K, v: V) -> Option<V> {
+    pub fn create(&mut self, k: K, v: V) -> Option<V> {
         self.0.insert(k, v)
     }
 
