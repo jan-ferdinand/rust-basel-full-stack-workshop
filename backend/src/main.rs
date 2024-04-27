@@ -7,6 +7,8 @@ use axum::Router;
 use serde::Deserialize;
 use serde::Serialize;
 
+use model::ShoppingListItem;
+
 #[derive(Serialize, Deserialize)]
 struct Workshop {
     num_attendees: i32,
@@ -25,12 +27,26 @@ async fn workshop_echo(json: Json<Workshop>) -> impl IntoResponse {
     json
 }
 
+async fn shopping_list_items() -> impl IntoResponse {
+    let items = ["bread", "hummus", "cucumber"]
+        .map(String::from)
+        .map(|title| ShoppingListItem {
+            title,
+            posted_by: "jfs".to_string(),
+            uuid: "jfs_list".to_string(),
+        })
+        .to_vec();
+
+    Json(items)
+}
+
 #[tokio::main]
 async fn main() {
     let app = Router::new()
         .route("/", get(hello_world))
         .route("/:name", get(hello_name))
-        .route("/echo", post(workshop_echo));
+        .route("/echo", post(workshop_echo))
+        .route("/items", get(shopping_list_items));
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3001").await.unwrap();
     axum::serve(listener, app).await.unwrap();
