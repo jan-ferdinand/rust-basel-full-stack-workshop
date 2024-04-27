@@ -18,7 +18,7 @@ async fn main() {
     let app = Router::new()
         .route("/items", get(controller::items))
         .route("/items", post(controller::add_item))
-        .route("/items", delete(controller::delete_item))
+        .route("/items/:uuid", delete(controller::delete_item))
         .layer(CorsLayer::permissive()) // never use “CorsLayer::permissive()” in production!
         .with_state(db);
 
