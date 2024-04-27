@@ -1,0 +1,9 @@
+{
+  "name": "fullstack-workshop",
+  "version": "1.0.0",
+  "description": "Rust-Basel Workshop on Full Stack Development.",
+  "main": "index.js",
+  "scripts": {},
+  "author": "Jan Ferdinand Sauer",
+  "license": "ISC"
+}
