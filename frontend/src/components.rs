@@ -3,9 +3,29 @@ use dioxus::prelude::*;
 use model::PostShoppingItem;
 
 use crate::controllers;
+use crate::Route;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct ListChange;
+
+#[component]
+pub fn layout() -> Element {
+    rsx! {
+        div {
+            class: "min-h-screen bg-base-300",
+            div {
+                class: "navbar flex",
+                div {
+                    Link { class: "p-4", to: Route::Home {}, "Home" }
+                    Link { class: "p-4", to: Route::Profile {}, "Profile" }
+                }
+            }
+            div { class: "container mx-auto max-w-[1024px] p-8",
+                Outlet::<Route>{}
+            }
+        }
+    }
+}
 
 #[component]
 pub fn shopping_list(change_signal: Signal<ListChange>) -> Element {

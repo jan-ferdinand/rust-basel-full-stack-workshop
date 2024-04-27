@@ -9,6 +9,7 @@ const _STYLE: &str = manganis::mg!(file("public/tailwind.css"));
 
 #[derive(Debug, Clone, PartialEq, Routable)]
 enum Route {
+    #[layout(crate::components::layout)]
     #[route("/", crate::home)]
     Home,
 
