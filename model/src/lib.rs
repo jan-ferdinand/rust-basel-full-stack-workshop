@@ -1,14 +1,9 @@
-pub fn add(left: usize, right: usize) -> usize {
-    left + right
-}
+use serde::Deserialize;
+use serde::Serialize;
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct ShoppingListItem {
+    pub title: String,
+    pub posted_by: String,
+    pub uuid: String,
 }
