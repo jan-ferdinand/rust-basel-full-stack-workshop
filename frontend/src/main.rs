@@ -1,5 +1,6 @@
 use dioxus::prelude::*;
 
+use model::PostShoppingItem;
 use model::ShoppingListItem;
 
 const _STYLE: &str = manganis::mg!(file("public/tailwind.css"));
@@ -10,14 +11,9 @@ fn main() {
 
 fn application() -> Element {
     rsx!(
-        h1 {
-            "Hello, Basel."
-        }
-        button {
-            class: "btn",
-            "Click me maybe ✨"
-        }
+        p { class: "h-16" }
         shopping_list{}
+        item_input{}
     )
 }
 
@@ -27,6 +23,18 @@ async fn get_items() -> Result<Vec<ShoppingListItem>, reqwest::Error> {
         .await?
         .json::<Vec<ShoppingListItem>>()
         .await
+}
+
+async fn post_item(item: PostShoppingItem) -> Result<ShoppingListItem, reqwest::Error> {
+    let response = reqwest::Client::new()
+        .post("http://localhost:3001/items")
+        .json(&item)
+        .send()
+        .await?
+        .json::<ShoppingListItem>()
+        .await?;
+
+    Ok(response)
 }
 
 #[component]
@@ -66,6 +74,57 @@ fn shopping_list_item_component(display_name: String, posted_by: String) -> Elem
                 "{display_name}"
             }
             span { "posted by {posted_by}" }
+        }
+    }
+}
+
+#[component]
+fn item_input() -> Element {
+    let mut item = use_signal(|| "".to_string());
+    let mut author = use_signal(|| "".to_string());
+
+    // We implement this closure later
+    let onsubmit = move |_| {
+        spawn(async move {
+            let title = item.read().to_string();
+            let posted_by = author.read().to_string();
+            let _ = post_item(PostShoppingItem { title, posted_by }).await;
+        });
+    };
+
+    rsx! {
+        div {
+            class: "w-300 m-4 mt-16 rounded",
+            form { class: "grid grid-cols-3 gap-2",
+                onsubmit: onsubmit,
+                div {
+                    input {
+                        value: "{item}",
+                        class: "input input-bordered input-primary w-full",
+                        placeholder: "next item..",
+                        r#type: "text",
+                        id: "item_name",
+                        name: "item_name",
+                        oninput: move |e| item.set(e.data.value().clone())
+                    }
+                }
+                div {
+                    input {
+                        value: "{author}",
+                        class: "input input-bordered input-primary w-full",
+                        placeholder: "wanted by..",
+                        r#type: "text",
+                        id: "author",
+                        name: "author",
+                        oninput: move |e| author.set(e.data.value().clone())
+                    }
+                }
+                button {
+                    class: "btn btn-primary w-full",
+                    r#type: "submit",
+                    "Add Item"
+                }
+            }
         }
     }
 }
