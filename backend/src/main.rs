@@ -6,6 +6,7 @@ use axum::Json;
 use axum::Router;
 use serde::Deserialize;
 use serde::Serialize;
+use tower_http::cors::CorsLayer;
 
 use model::ShoppingListItem;
 
@@ -46,7 +47,8 @@ async fn main() {
         .route("/", get(hello_world))
         .route("/:name", get(hello_name))
         .route("/echo", post(workshop_echo))
-        .route("/items", get(shopping_list_items));
+        .route("/items", get(shopping_list_items))
+        .layer(CorsLayer::permissive()); // never use “CorsLayer::permissive()” in production!
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3001").await.unwrap();
     axum::serve(listener, app).await.unwrap();
