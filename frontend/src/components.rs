@@ -27,6 +27,7 @@ pub fn shopping_list(change_signal: Signal<ListChange>) -> Element {
                                 display_name: i.title.clone(),
                                 posted_by: i.posted_by.clone(),
                                 uuid: i.uuid.clone(),
+                                change_signal,
                             }
                         }
                     }
@@ -39,7 +40,12 @@ pub fn shopping_list(change_signal: Signal<ListChange>) -> Element {
 }
 
 #[component]
-fn shopping_list_item_component(uuid: String, display_name: String, posted_by: String) -> Element {
+fn shopping_list_item_component(
+    uuid: String,
+    display_name: String,
+    posted_by: String,
+    change_signal: Signal<ListChange>,
+) -> Element {
     rsx! {
         div {
             class: "flex items-center space-x-2",
@@ -48,17 +54,20 @@ fn shopping_list_item_component(uuid: String, display_name: String, posted_by: S
                 "{display_name}"
             }
             span { "posted by {posted_by}" }
-            item_delete_button { uuid }
+            item_delete_button { uuid, change_signal }
         }
     }
 }
 
 #[component]
-fn item_delete_button(uuid: String) -> Element {
+fn item_delete_button(uuid: String, change_signal: Signal<ListChange>) -> Element {
     let onclick = move |_| {
         let uuid = uuid.clone();
         spawn(async move {
-            let _ = controllers::delete_item(&uuid).await;
+            let response = controllers::delete_item(&uuid).await;
+            if response.is_ok() {
+                change_signal.write();
+            }
         });
     };
 
