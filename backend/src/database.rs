@@ -36,7 +36,7 @@ where
         self.0.get(k)
     }
 
-    fn _delete(&mut self, k: &K) -> Option<V> {
+    pub fn delete(&mut self, k: &K) -> Option<V> {
         self.0.remove(k)
     }
 

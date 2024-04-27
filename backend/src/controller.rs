@@ -1,3 +1,4 @@
+use axum::extract::Path;
 use axum::extract::State;
 use axum::http::StatusCode;
 use axum::response::IntoResponse;
@@ -60,4 +61,16 @@ pub async fn add_item(
     };
 
     (StatusCode::OK, Json(item)).into_response()
+}
+
+pub async fn delete_item(
+    State(state): State<Database>,
+    Path(uuid): Path<String>,
+) -> impl IntoResponse {
+    let Ok(mut db) = state.write() else {
+        return StatusCode::SERVICE_UNAVAILABLE;
+    };
+
+    db.delete(&uuid);
+    StatusCode::OK
 }
