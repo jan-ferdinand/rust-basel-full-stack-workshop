@@ -5,6 +5,7 @@ edition = "2021"
 
 [dependencies]
 axum = "0.7.5"
+uuid = { version = "1.8.0", features = ["v4"] }
 model = { path = "../model" }
 serde = { version = "1.0.199", features = ["derive"] }
 tokio = { version = "1.37.0", features = ["full"] }
