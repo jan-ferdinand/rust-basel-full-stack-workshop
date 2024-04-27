@@ -2,9 +2,17 @@ use dioxus::prelude::*;
 
 use model::PostShoppingItem;
 
+use crate::controllers;
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct ListChange;
+
 #[component]
-pub fn shopping_list() -> Element {
-    let items_request = use_resource(move || async move { crate::controllers::get_items().await });
+pub fn shopping_list(change_signal: Signal<ListChange>) -> Element {
+    let items_request = use_resource(move || async move {
+        change_signal.read();
+        controllers::get_items().await
+    });
     let readable = items_request.read();
 
     match &*readable {
@@ -44,16 +52,18 @@ fn shopping_list_item_component(display_name: String, posted_by: String) -> Elem
 }
 
 #[component]
-pub fn item_input() -> Element {
+pub fn item_input(change_signal: Signal<ListChange>) -> Element {
     let mut item = use_signal(|| "".to_string());
     let mut author = use_signal(|| "".to_string());
 
-    // We implement this closure later
     let onsubmit = move |_| {
         spawn(async move {
             let title = item.read().to_string();
             let posted_by = author.read().to_string();
-            let _ = crate::controllers::post_item(PostShoppingItem { title, posted_by }).await;
+            let response = controllers::post_item(PostShoppingItem { title, posted_by }).await;
+            if response.is_ok() {
+                change_signal.write();
+            }
         });
     };
 
